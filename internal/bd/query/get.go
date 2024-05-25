@@ -8,6 +8,40 @@ import (
 	"log"
 )
 
+func GetAllOrderUIDs() ([]string, error) {
+	db, err := connection.DB()
+	if err != nil {
+		log.Printf("Failed to connect to DB: %v", err)
+		return nil, err
+	}
+	defer db.Close()
+
+	query := `SELECT order_uid FROM orders`
+
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Printf("Failed to get all orders_id : %v", err)
+		return nil, err
+	}
+
+	var orderUIDs []string
+	for rows.Next() {
+		var orderID string
+		if err := rows.Scan(&orderID); err != nil {
+			log.Printf("Failed to scan row: %v", err)
+			continue
+		}
+		orderUIDs = append(orderUIDs, orderID)
+
+		if err := rows.Err(); err != nil {
+			log.Printf("Error occurred while iterating rows: %v", err)
+			return nil, err
+		}
+
+	}
+	return orderUIDs, nil
+}
+
 func GetOrder(id string, data *structs.Order) error {
 	db, err := connection.DB()
 	if err != nil {
@@ -75,7 +109,6 @@ func GetDelivery(id string, data *structs.Order) error {
 		&data.Delivery.Zip,
 		&data.Delivery.City,
 		&data.Delivery.Address,
-		&data.Delivery.Region,
 		&data.Delivery.Region,
 		&data.Delivery.Email,
 	)
@@ -159,7 +192,7 @@ func GetItems(id string, data *structs.Order) error {
 	var items []structs.Item
 
 	for rows.Next() {
-		tmpId := 0
+		var tmpId string
 		var item structs.Item
 		err = rows.Scan(
 			&item.ChrtID,
