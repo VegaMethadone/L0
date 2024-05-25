@@ -41,13 +41,8 @@ import (
 )
 
 // Структура для примера
-type Message struct {
-	ID      int    `json:"id"`
-	Title   string `json:"title"`
-	Content string `json:"content"`
-}
 
-func Client(message Message) {
+func Client(message Order) {
 	// Подключение к NATS серверу
 	nc, err := nats.Connect("nats://localhost:4222")
 	if err != nil {

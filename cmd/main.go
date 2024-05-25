@@ -1,6 +1,7 @@
 package main
 
 import (
+	"L0/internal/server"
 	"fmt"
 	"log"
 
@@ -36,4 +37,10 @@ func main() {
 	// Ожидание завершения
 	fmt.Println("Подписан на канал. Ожидание сообщений...")
 	select {} // Блокировка основной горутины, чтобы программа не завершилась
+
+	srv, err := server.NewServer()
+	if err != nil {
+		log.Fatalf("Could not start server: %v", err)
+	}
+
 }
