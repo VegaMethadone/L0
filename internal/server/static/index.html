@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-image: url('https://sun9-30.userapi.com/impg/swfxHxUXbMgeaKSIr-rT45mVMoUdDruzhRXJBA/ieuPQAAVGNk.jpg?size=2560x1440&quality=96&sign=5b6ffe424ce5580cd9564fe47e084ee3&type=album');
+            background-size: cover;
+        }
+        .container {
+            display: flex;
+            flex-direction: row;
+            background-color: rgba(255, 255, 255, 0.5); /* Белый фон с прозрачностью */
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .input-container {
+            margin-right: 20px;
+        }
+        input[type="text"] {
+            width: 200px;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: none;
+        }
+        #result {
+            font-size: 18px;
+            font-weight: bold;
+            max-width: 500px;
+            overflow-wrap: break-word; /* Для переноса слов */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="input-container">
+            <input type="text" id="inputId" placeholder="Введите ID">
+        </div>
+        <div id="result"></div>
+    </div>
+    <script>
+        document.getElementById('inputId').addEventListener('input', function() {
+            var id = this.value;
+    
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'http://127.0.0.1:8080/orders/' + id, true);
+            xhr.onload = function() {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        var response = JSON.parse(xhr.responseText);
+                        var orderInfo = 'Номер заказа: ' + response.order_uid + '<br>';
+                        orderInfo += 'Номер отслеживания: ' + response.track_number + '<br>';
+                        orderInfo += 'Имя доставки: ' + response.delivery.name + '<br>';
+                        orderInfo += 'Телефон: ' + response.delivery.phone + '<br>';
+                        orderInfo += 'Адрес: ' + response.delivery.address + ', ' + response.delivery.city + ', ' + response.delivery.zip + '<br>';
+                        orderInfo += 'Почта: ' + response.delivery.email + '<br>';
+    
+                        var itemsTable = '<table border="1">';
+                        itemsTable += '<tr><th>Название товара</th><th>Цена</th><th>Бренд</th></tr>';
+                        response.items.forEach(function(item) {
+                            itemsTable += '<tr>';
+                            itemsTable += '<td>' + item.name + '</td>';
+                            itemsTable += '<td>' + item.price + '</td>';
+                            itemsTable += '<td>' + item.brand + '</td>';
+                            itemsTable += '</tr>';
+                        });
+                        itemsTable += '</table>';
+    
+                        orderInfo += 'Товары: <br>' + itemsTable;
+    
+                        document.getElementById('result').innerHTML = orderInfo;
+                    } catch (error) {
+                        document.getElementById('result').textContent = 'Ошибка при обработке JSON-ответа: ' + error.message;
+                    }
+                } else {
+                    document.getElementById('result').textContent = 'Ошибка: ' + xhr.status;
+                }
+            };
+            xhr.onerror = function() {
+                document.getElementById('result').textContent = 'Запрос не удался';
+            };
+            xhr.send();
+        });
+    </script>
+    
+</body>
+</html>

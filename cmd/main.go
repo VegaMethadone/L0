@@ -55,11 +55,15 @@ func connectAndListenNats() {
 	defer sc.Close()
 
 	natsMessageHandler := func(msg *stan.Msg) {
-		fmt.Printf("Received message: %s\n", string(msg.Data))
+		fmt.Println("Received message")
 
 		var gotData structs.Order
 		if err := json.Unmarshal(msg.Data, &gotData); err != nil {
 			log.Printf("Error decoding message: %v\n", err)
+			return
+		}
+
+		if cache.Cache.IsExist(gotData.OrderUID) {
 			return
 		}
 

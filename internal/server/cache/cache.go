@@ -35,6 +35,13 @@ func (c *RwCache) Get(key string) (*structs.Order, error) {
 	return value, nil
 }
 
+func (c *RwCache) IsExist(key string) bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	_, exists := c.cache[key]
+	return exists
+}
+
 func (c *RwCache) Restore() error {
 	arr, err := bd.GetUIDs()
 	if err != nil {

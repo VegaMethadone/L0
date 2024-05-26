@@ -4,7 +4,10 @@ import (
 	"L0/internal/server/cache"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/gorilla/mux"
 )
@@ -31,6 +34,25 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+}
+
+func OrdersHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		log.Printf("Failed to get wd: %v\n", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	filePath := filepath.Join(wd, "..", "internal", "server", "static", "index.html")
+	log.Println("File path:", filePath)
+
+	http.ServeFile(w, r, filePath)
 }
 
 func GetByIdOrderHandler(w http.ResponseWriter, r *http.Request) {
