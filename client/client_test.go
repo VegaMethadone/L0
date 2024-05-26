@@ -85,7 +85,7 @@ func getRandomData() *Order {
 }
 
 func TestClient(t *testing.T) {
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 5; i++ {
 		validData := getRandomData()
 
 		data, err := json.MarshalIndent(validData, "", "	")

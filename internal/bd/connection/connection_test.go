@@ -9,7 +9,7 @@ import (
 func TestGetConnection(t *testing.T) {
 	result := getConnectionStr()
 	if result == "" {
-		log.Fatalf("Condif is damaged")
+		log.Fatalf("Config is damaged")
 		return
 	}
 	fmt.Println(result)
