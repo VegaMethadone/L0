@@ -35,14 +35,14 @@ func (c *RwCache) Get(key string) (*structs.Order, error) {
 	return value, nil
 }
 
-func (c *RwCache) Restore() {
+func (c *RwCache) Restore() error {
 	arr, err := bd.GetUIDs()
 	if err != nil {
-		log.Printf("Faild to restore data")
-		return
+		log.Printf("Faild to restore data\n")
+		return err
 	}
 	for _, data := range arr {
 		c.cache[data.OrderUID] = data
 	}
-
+	return nil
 }
