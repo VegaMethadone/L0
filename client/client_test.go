@@ -2,14 +2,27 @@ package client
 
 import (
 	"encoding/json"
+	"fmt"
+	"log"
+	"math/rand"
 	"testing"
 	"time"
 )
 
-func TestClient(t *testing.T) {
-	var validData = &Order{
-		OrderUID:    "b563feb7b2b84b6test",
-		TrackNumber: "WBILMTESTTRACK",
+func randomString(length int) string {
+	charset := "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	seededRand := rand.New(rand.NewSource(time.Now().UnixNano()))
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[seededRand.Intn(len(charset))]
+	}
+	return string(b)
+}
+
+func getRandomData() *Order {
+	return &Order{
+		OrderUID:    randomString(20),
+		TrackNumber: randomString(12),
 		Entry:       "WBIL",
 		Delivery: Delivery{
 			Name:    "Test Testov",
@@ -21,41 +34,41 @@ func TestClient(t *testing.T) {
 			Email:   "test@gmail.com",
 		},
 		Payment: Payment{
-			Transaction:  "b563feb7b2b84b6test",
+			Transaction:  randomString(20),
 			RequestID:    "",
 			Currency:     "USD",
 			Provider:     "wbpay",
-			Amount:       1817,
-			PaymentDT:    1637907727,
+			Amount:       rand.Intn(5000),
+			PaymentDT:    time.Now().Unix(),
 			Bank:         "alpha",
-			DeliveryCost: 1500,
-			GoodsTotal:   317,
+			DeliveryCost: rand.Intn(2000),
+			GoodsTotal:   rand.Intn(1000),
 			CustomFee:    0,
 		},
 		Items: []Item{
 			{
-				ChrtID:      9934930,
-				TrackNumber: "WBILMTESTTRACK",
-				Price:       453,
-				RID:         "ab4219087a764ae0btest",
+				ChrtID:      rand.Intn(100000),
+				TrackNumber: randomString(12),
+				Price:       rand.Intn(1000),
+				RID:         randomString(20),
 				Name:        "Mascaras",
-				Sale:        30,
+				Sale:        rand.Intn(50),
 				Size:        "0",
-				TotalPrice:  317,
-				NMID:        2389212,
+				TotalPrice:  rand.Intn(500),
+				NMID:        rand.Intn(100000),
 				Brand:       "Vivienne Sabo",
 				Status:      202,
 			},
 			{
-				ChrtID:      9934931,
-				TrackNumber: "WBILMTESTTRACK",
-				Price:       453,
-				RID:         "ab4219087a764ae0btest",
+				ChrtID:      rand.Intn(100000),
+				TrackNumber: randomString(12),
+				Price:       rand.Intn(1000),
+				RID:         randomString(20),
 				Name:        "Mascaras",
-				Sale:        30,
+				Sale:        rand.Intn(50),
 				Size:        "0",
-				TotalPrice:  317,
-				NMID:        2389212,
+				TotalPrice:  rand.Intn(500),
+				NMID:        rand.Intn(100000),
 				Brand:       "Vivienne Sabo",
 				Status:      202,
 			},
@@ -66,12 +79,20 @@ func TestClient(t *testing.T) {
 		DeliveryService:   "meest",
 		ShardKey:          "9",
 		SMID:              99,
-		DateCreated:       time.Date(2021, time.November, 26, 6, 22, 19, 0, time.UTC),
+		DateCreated:       time.Now(),
 		OofShard:          "1",
 	}
+}
 
-	data, err := json.MarshalIndent(validData, "", "	")
-	if err != nil {
+func TestClient(t *testing.T) {
+	for i := 0; i < 100; i++ {
+		validData := getRandomData()
 
+		data, err := json.MarshalIndent(validData, "", "	")
+		if err != nil {
+			log.Fatalf("Faild to convert into JSON formt: %v\n", err)
+		}
+		fmt.Println(string(data))
+		Client(*validData)
 	}
 }
