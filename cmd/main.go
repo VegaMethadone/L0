@@ -88,5 +88,7 @@ func startServer() {
 		return
 	}
 
+	log.Printf("Server is working at: http://%s\n", srv.Addr)
+	log.Printf("if you want to check order: http://%s/orders/{id}", srv.Addr)
 	log.Panicln(srv.ListenAndServe())
 }

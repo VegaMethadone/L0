@@ -3,10 +3,8 @@ package handlers
 import (
 	"L0/internal/server/cache"
 	"encoding/json"
+	"io"
 	"net/http"
-	"os"
-	"path/filepath"
-	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -17,18 +15,22 @@ func HomeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	imagePath := "img/home.jpg"
+	imageURL := "https://sun9-30.userapi.com/impg/swfxHxUXbMgeaKSIr-rT45mVMoUdDruzhRXJBA/ieuPQAAVGNk.jpg?size=2560x1440&quality=96&sign=5b6ffe424ce5580cd9564fe47e084ee3&type=album"
 
-	imageFile, err := os.Open(imagePath)
+	resp, err := http.Get(imageURL)
 	if err != nil {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
-	defer imageFile.Close()
+	defer resp.Body.Close()
 
-	w.Header().Set("Content-Type", "image/jpeg")
+	w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
 
-	http.ServeContent(w, r, filepath.Base(imagePath), time.Time{}, imageFile)
+	_, err = io.Copy(w, resp.Body)
+	if err != nil {
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 }
 
 func GetByIdOrderHandler(w http.ResponseWriter, r *http.Request) {
